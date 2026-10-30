@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Centers & Garages - BikeCare</title>
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <style>
+        .landing-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 2rem;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+        }
+        .page-banner {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        .filter-bar {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-top: -2rem;
+            box-shadow: var(--shadow-md);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr) auto;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        .provider-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .provider-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+        .service-tag {
+            display: inline-block;
+            background: #f1f5f9;
+            color: var(--text-secondary);
+            font-size: 0.6875rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: var(--radius-sm);
+            margin: 0.2rem;
+        }
+        @media (max-width: 900px) {
+            .filter-bar { grid-template-columns: 1fr; margin-top: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="landing-nav">
+        <a href="/index.html" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none;">
+            <div class="brand-logo">B</div>
+            <span class="brand-text" style="color: var(--text-primary);">Bike<span>Care</span></span>
+        </a>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="/login.html" class="btn btn-outline" id="nav-login-btn">Sign In</a>
+            <a href="/register.html" class="btn btn-primary" id="nav-register-btn">Register Free</a>
+        </div>
+    </header>
+
+    <div class="page-banner">
+        <h1 style="color: #ffffff; font-size: 2.25rem;">Authorized Showrooms & Local Garages</h1>
+        <p style="color: #94a3b8; margin-top: 0.5rem;">Discover verified service workshops, compare services, and book your next tune-up.</p>
+    </div>
+
+    <main class="app-content" style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 4rem;">
+        <div class="filter-bar">
+            <div>
+                <label class="form-label">Workshop Type</label>
+                <select class="form-select" id="filter-kind">
+                    <option value="">All Types (Showroom & Garage)</option>
+                    <option value="showroom">Showroom Service</option>
+                    <option value="mechanic">Local Mechanic</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label">City</label>
+                <input type="text" class="form-control" id="filter-city" placeholder="e.g. Bangalore">
+            </div>
+            <div>
+                <label class="form-label">Location / Area</label>
+                <input type="text" class="form-control" id="filter-query" placeholder="e.g. Koramangala, Metro">
+            </div>
+            <div>
+                <label class="form-label">Service Type</label>
+                <input type="text" class="form-control" id="filter-service" placeholder="e.g. Engine, Brakes">
+            </div>
+            <div>
+                <button class="btn btn-primary" id="btn-apply-filters" style="height: 42px;">Search Centers</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 2.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 id="result-count">Showing workshops...</h3>
+                <span class="text-muted" style="font-size: 0.875rem;">Verified workshops with guaranteed digital billing</span>
+            </div>
+
+            <div class="grid grid-3" id="providers-grid">
+                <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+                    <span class="spinner"></span>
+                    <p style="margin-top: 1rem; color: var(--text-muted);">Finding service workshops...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="/js/api.js"></script>
+    <script type="module" src="/js/format.js"></script>
+    <script type="module">
+        import { API } from "/js/api.js";
+        import { escapeHtml } from "/js/format.js";
+
+        // Pre-fill filter from URL query
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("kind")) {
+            document.getElementById("filter-kind").value = urlParams.get("kind");
+        }
+
+        async function loadProviders() {
+            const kind = document.getElementById("filter-kind").value;
+            const city = document.getElementById("filter-city").value;
+            const q = document.getElementById("filter-query").value;
+            const service = document.getElementById("filter-service").value;
+
+            const grid = document.getElementById("providers-grid");
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem;"><span class="spinner"></span></div>`;
+
+            try {
+                const providers = await API.get("/providers", { kind, city, q, service });
+                document.getElementById("result-count").textContent = `${providers.length} Workshop${providers.length === 1 ? '' : 's'} Found`;
+
+                if (providers.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1/-1;">
+                            <div class="empty-icon">🏍️</div>
+                            <h4 class="empty-title">No service centers match your filters</h4>
+                            <p class="empty-desc">Try clearing or broadening your search criteria.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = providers.map(p => {
+                    const servicesList = p.services ? p.services.split(",").map(s => `<span class="service-tag">${escapeHtml(s.trim())}</span>`).join("") : "";
+                    const isOpenBadge = p.is_open 
+                        ? `<span class="badge" style="background: #d1fae5; color: #065f46;">● Open Now</span>`
+                        : `<span class="badge" style="background: #fee2e2; color: #991b1b;">Closed</span>`;
+
+                    const kindBadge = p.kind === "showroom"
+                        ? `<span class="badge" style="background: #ffedd5; color: #c2410c;">🏢 Showroom</span>`
+                        : `<span class="badge" style="background: #e0e7ff; color: #3730a3;">🔧 Local Garage</span>`;
+
+                    return `
+                        <div class="provider-card">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                                    ${kindBadge}
+                                    ${isOpenBadge}
+                                </div>
+                                <h3 style="font-size: 1.25rem; margin-bottom: 0.35rem;">${escapeHtml(p.name)}</h3>
+                                <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                    📍 ${escapeHtml(p.address)}, ${escapeHtml(p.city)}
+                                </p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem;">
+                                    Landmark: ${escapeHtml(p.location_text)}
+                                </p>
+                                <div style="margin-bottom: 1.25rem;">
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem;">SERVICES OFFERED:</div>
+                                    <div>${servicesList}</div>
+                                </div>
+                            </div>
+                            <div style="border-top: 1px solid var(--border); padding-top: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                                <span style="font-size: 0.8125rem; font-weight: 600;">📞 ${escapeHtml(p.phone)}</span>
+                                <a href="/customer/book.html?provider_id=${p.id}" class="btn btn-sm btn-primary">Book Service</a>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+            } catch (err) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--danger); padding: 3rem;">Failed to load service centers.</div>`;
+            }
+        }
+
+        document.getElementById("btn-apply-filters").addEventListener("click", loadProviders);
+        document.querySelectorAll("#filter-kind, #filter-city, #filter-query, #filter-service").forEach(el => {
+            el.addEventListener("keypress", (e) => {
+                if (e.key === "Enter") loadProviders();
+            });
+        });
+
+        loadProviders();
+    </script>
+</body>
+</html>

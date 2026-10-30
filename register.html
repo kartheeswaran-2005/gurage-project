@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Customer Account - BikeCare</title>
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 1.5rem;
+        }
+        .auth-container {
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-xl);
+            padding: 2.5rem;
+            animation: modalScaleUp 0.25s ease-out;
+        }
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.75rem;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <a href="/index.html" class="auth-logo">
+            <div class="brand-logo">B</div>
+            <span class="brand-text" style="color: var(--text-primary);">Bike<span>Care</span></span>
+        </a>
+
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.35rem;">Create Rider Account</h2>
+        <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1.75rem;">
+            Register to manage your two-wheelers, book services, and get live digital job cards.
+        </p>
+
+        <div id="register-alert" class="alert alert-danger" style="display: none;"></div>
+
+        <form id="register-form">
+            <div class="form-group">
+                <label class="form-label required" for="full_name">Full Name</label>
+                <input type="text" id="full_name" class="form-control" placeholder="e.g. Rahul Sharma" required minlength="2">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label required" for="email">Email Address</label>
+                <input type="email" id="email" class="form-control" placeholder="name@example.com" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="phone">Mobile Phone (optional)</label>
+                <input type="tel" id="phone" class="form-control" placeholder="+91 98765 43210">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label required" for="password">Choose Password</label>
+                <input type="password" id="password" class="form-control" placeholder="Minimum 6 characters" required minlength="6">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label required" for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" class="form-control" placeholder="Repeat your password" required minlength="6">
+            </div>
+
+            <button type="submit" id="btn-submit" class="btn btn-primary" style="width: 100%; height: 44px; margin-top: 0.5rem;">
+                Create Free Account
+            </button>
+        </form>
+
+        <p style="text-align: center; font-size: 0.875rem; color: var(--text-secondary); margin-top: 1.75rem;">
+            Already have an account? <a href="/login.html" style="font-weight: 600;">Sign in</a>
+        </p>
+    </div>
+
+    <script type="module" src="/js/api.js"></script>
+    <script type="module" src="/js/ui.js"></script>
+    <script type="module">
+        import { API, Auth } from "/js/api.js";
+        import { UI } from "/js/ui.js";
+        import { HOME } from "/js/routes.js";
+
+        // Requirement C.2: Logged-in user opens register.html -> redirect to own dashboard
+        (async () => {
+            try {
+                const me = await Auth.restoreSession();
+                if (me && me.role && HOME[me.role]) {
+                    window.location.replace(HOME[me.role]);
+                }
+            } catch (_) {}
+        })();
+
+        const form = document.getElementById("register-form");
+        const alertBox = document.getElementById("register-alert");
+        const submitBtn = document.getElementById("btn-submit");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            alertBox.style.display = "none";
+
+            const fullName = document.getElementById("full_name").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirm_password").value;
+
+            if (password !== confirmPassword) {
+                alertBox.textContent = "Passwords do not match. Please re-enter.";
+                alertBox.style.display = "block";
+                return;
+            }
+
+            UI.setLoading(submitBtn, true);
+
+            try {
+                await API.post("/auth/register", {
+                    full_name: fullName,
+                    email,
+                    phone: phone || null,
+                    password
+                });
+
+                // Automatically log in on successful registration
+                const loginRes = await API.post("/auth/login", { email, password });
+                API.setToken(loginRes.access_token);
+                API.setUser({
+                    id: loginRes.user_id,
+                    full_name: loginRes.full_name,
+                    role: loginRes.role,
+                    provider_id: loginRes.provider_id
+                });
+
+                window.location.href = "/customer/dashboard.html";
+            } catch (err) {
+                UI.setLoading(submitBtn, false);
+                alertBox.textContent = err.message || "Registration failed. Please check your inputs.";
+                alertBox.style.display = "block";
+            }
+        });
+    </script>
+</body>
+</html>

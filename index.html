@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BikeCare - Smart Bike Service Management Platform</title>
+    <meta name="description" content="BikeCare connects motorcycle riders with verified brand showrooms and skilled local mechanic garages. Seamless service booking, transparent digital estimates, and real-time repair tracking.">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <style>
+        .landing-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 2rem;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            padding: 5rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(234, 88, 12, 0.2);
+            color: #ffedd5;
+            border: 1px solid rgba(234, 88, 12, 0.4);
+            padding: 0.35rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8125rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .hero h1 {
+            color: #ffffff;
+            font-size: 3rem;
+            font-weight: 800;
+            max-width: 800px;
+            margin: 0 auto 1.25rem;
+            letter-spacing: -0.025em;
+        }
+        .hero h1 span {
+            color: var(--primary);
+        }
+        .hero p {
+            color: #94a3b8;
+            font-size: 1.125rem;
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.6;
+        }
+        .hero-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 380px));
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        .hero-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            text-align: left;
+            transition: all 0.25s ease;
+            backdrop-filter: blur(8px);
+        }
+        .hero-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.3);
+        }
+        .hero-card h3 {
+            color: #ffffff;
+            font-size: 1.375rem;
+            margin: 0.75rem 0 0.5rem;
+        }
+        .hero-card p {
+            color: #cbd5e1;
+            font-size: 0.875rem;
+            margin: 0 0 1.5rem;
+        }
+        .steps-section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .section-header h2 {
+            font-size: 2.25rem;
+            margin-bottom: 0.75rem;
+        }
+        .section-header p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 3.5rem;
+        }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            text-align: left;
+        }
+        .step-item {
+            position: relative;
+        }
+        .step-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-light);
+            font-family: var(--font-heading);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+        .step-item h4 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+        }
+        .step-item p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .benefits-section {
+            background-color: var(--surface);
+            padding: 5rem 2rem;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .benefits-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+        .benefit-card {
+            padding: 1.5rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: #ffffff;
+        }
+        .benefit-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            background: #0f172a;
+        }
+        @media (max-width: 768px) {
+            .hero-options, .steps-grid, .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 { font-size: 2.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="landing-nav">
+        <a href="/index.html" class="d-flex align-items-center gap-2" style="display: flex; align-items: center; gap: 0.75rem;">
+            <div class="brand-logo">B</div>
+            <span class="brand-text" style="color: var(--text-primary);">Bike<span>Care</span></span>
+        </a>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="/providers.html" class="btn btn-outline">Find Centers</a>
+            <a href="/login.html" class="btn btn-outline" id="nav-login-btn">Sign In</a>
+            <a href="/register.html" class="btn btn-primary" id="nav-register-btn">Register Free</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-badge">Next-Gen Two-Wheeler Care</div>
+            <h1>Smart Motorcycle Care <span>Engineered for Reliability</span></h1>
+            <p>From authorized brand showrooms to trusted neighborhood master mechanics, book services with digital inspections, real-time approvals, and transparent pricing.</p>
+
+            <div class="hero-options">
+                <div class="hero-card">
+                    <span style="font-size: 2rem;">🏢</span>
+                    <h3>Showroom Service</h3>
+                    <p>Official brand service centers with genuine OEM parts, specialized diagnostic bays, and warranty preservation.</p>
+                    <a href="/providers.html?kind=showroom" class="btn btn-primary" style="width: 100%;">Explore Showrooms &rarr;</a>
+                </div>
+
+                <div class="hero-card">
+                    <span style="font-size: 2rem;">🔧</span>
+                    <h3>Local Mechanic</h3>
+                    <p>Independent garages for rapid turnaround, personalized craftsmanship, and cost-effective periodic maintenance.</p>
+                    <a href="/providers.html?kind=mechanic" class="btn btn-primary" style="width: 100%;">Find Local Mechanics &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="steps-section">
+            <div class="section-header">
+                <h2>How BikeCare Works</h2>
+                <p>Four effortless steps from service booking to key handover with complete visibility.</p>
+            </div>
+
+            <div class="steps-grid">
+                <div class="step-item">
+                    <div class="step-number">01</div>
+                    <h4>Select Bike & Center</h4>
+                    <p>Add your motorcycle details, choose between an authorized showroom or local garage, and pick your preferred appointment date.</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">02</div>
+                    <h4>Digital Inspection</h4>
+                    <p>Upon check-in, our advisors capture fuel level, scratch damage, and conduct multi-point diagnostics on your vehicle.</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">03</div>
+                    <h4>Real-Time Approval</h4>
+                    <p>Receive an itemized digital estimate. Review labour and spare part costs directly on your phone and approve with one tap.</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">04</div>
+                    <h4>Quality Check & Pickup</h4>
+                    <p>Track repairs on a live timeline. Settle payments seamlessly via UPI/Card and collect your serviced motorcycle.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="benefits-section">
+            <div class="section-header" style="text-align: center;">
+                <h2>Why Riders Choose BikeCare</h2>
+                <p>Designed to eliminate workshop friction and surprise billing forever.</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">🛡️</div>
+                    <h4>Zero Hidden Charges</h4>
+                    <p>No unexpected add-ons. Every part and labour item requires your explicit digital authorization before work begins.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">⏱️</div>
+                    <h4>Live Repair Timeline</h4>
+                    <p>Watch your bike move from inspection to repairing and quality check with timestamped audit trails.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🤖</div>
+                    <h4>Smart Complaint Assistant</h4>
+                    <p>Describe issues in your own words. Our AI analyzes symptoms and formulates precise diagnostic notes for the mechanic.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 BikeCare Technologies Pvt Ltd. All rights reserved. Smart Two-Wheeler Service Platform.</p>
+    </footer>
+
+    <script type="module" src="/js/api.js"></script>
+    <script type="module">
+        import { API } from "/js/api.js";
+        // If user already logged in, update navigation
+        const user = API.getUser();
+        const token = API.getToken();
+        if (token && user) {
+            const roleRoutes = {
+                customer: "/customer/dashboard.html",
+                employee: "/employee/dashboard.html",
+                mechanic: "/mechanic/dashboard.html",
+                owner: "/owner/dashboard.html"
+            };
+            const btn = document.getElementById("nav-login-btn");
+            if (btn) {
+                btn.textContent = "My Dashboard";
+                btn.href = roleRoutes[user.role] || "/login.html";
+                btn.classList.remove("btn-outline");
+                btn.classList.add("btn-primary");
+            }
+            const regBtn = document.getElementById("nav-register-btn");
+            if (regBtn) regBtn.style.display = "none";
+        }
+        <script src="/js/auth-guard.js"></script>
+    </script>
+</body>
+</html>

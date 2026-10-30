@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - BikeCare</title>
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 1.5rem;
+        }
+        .auth-container {
+            width: 100%;
+            max-width: 460px;
+            background: #ffffff;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-xl);
+            padding: 2.5rem;
+            animation: modalScaleUp 0.25s ease-out;
+        }
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            text-decoration: none;
+        }
+        .demo-credentials-box {
+            background-color: #f8fafc;
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+        }
+        .demo-cred-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.25rem 0;
+            border-bottom: 1px dotted var(--border);
+        }
+        .demo-cred-row:last-child { border-bottom: none; }
+        .demo-fill-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-decoration: underline;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8125rem;
+            color: #64748b;
+            margin-bottom: 0.25rem;
+        }
+        .checklist-item.valid {
+            color: #16a34a;
+            font-weight: 600;
+        }
+        .checklist-item .icon {
+            font-size: 0.875rem;
+        }
+        .pw-wrapper {
+            position: relative;
+        }
+        .pw-toggle-btn {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <a href="/index.html" class="auth-logo">
+            <div class="brand-logo">B</div>
+            <span class="brand-text" style="color: var(--text-primary);">Bike<span>Care</span></span>
+        </a>
+
+        <!-- System Notices -->
+        <div id="login-notice" class="alert alert-info" style="display: none; margin-bottom: 1rem;"></div>
+        <div id="login-alert" class="alert alert-danger" style="display: none; margin-bottom: 1rem;"></div>
+        <div id="login-success" class="alert alert-success" style="display: none; margin-bottom: 1rem;"></div>
+
+        <!-- PANEL 1: Standard Login Form -->
+        <div id="panel-login">
+            <h2 style="font-size: 1.5rem; margin-bottom: 0.35rem;">Welcome back</h2>
+            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1.5rem;">
+                Unified sign in for Customers, Service Advisors, Mechanics & Workshop Owners.
+            </p>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label required" for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="name@example.com" required autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.375rem;">
+                        <label class="form-label required" for="password" style="margin-bottom: 0;">Password</label>
+                    </div>
+                    <div class="pw-wrapper">
+                        <input type="password" id="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+                        <button type="button" class="pw-toggle-btn" id="toggle-login-pwd" title="Toggle password visibility">👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-submit" class="btn btn-primary" style="width: 100%; height: 44px; margin-top: 0.5rem;">
+                    Sign In to Dashboard
+                </button>
+            </form>
+
+            <p style="text-align: center; font-size: 0.875rem; color: var(--text-secondary); margin-top: 1.5rem;">
+                Don't have a customer account? <a href="/register.html" style="font-weight: 600;">Register here</a>
+            </p>
+
+            <div class="demo-credentials-box">
+                <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">⚡ Quick Demo Logins</div>
+                <div class="demo-cred-row">
+                    <span><strong>Owner:</strong> owner@bikecare.com</span>
+                    <button class="demo-fill-btn" data-email="owner@bikecare.com" data-pwd="Owner@1234">Auto-fill</button>
+                </div>
+                <div class="demo-cred-row">
+                    <span><strong>Employee:</strong> employee@bikecare.com</span>
+                    <button class="demo-fill-btn" data-email="employee@bikecare.com" data-pwd="Staff@1234">Auto-fill</button>
+                </div>
+                <div class="demo-cred-row">
+                    <span><strong>Mechanic:</strong> mechanic@bikecare.com</span>
+                    <button class="demo-fill-btn" data-email="mechanic@bikecare.com" data-pwd="Staff@1234">Auto-fill</button>
+                </div>
+                <div class="demo-cred-row">
+                    <span><strong>Customer:</strong> customer@bikecare.com</span>
+                    <button class="demo-fill-btn" data-email="customer@bikecare.com" data-pwd="Customer@1234">Auto-fill</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL 2: Choose Your New Password (First-Login Flow) -->
+        <div id="panel-setup-password" style="display: none;">
+            <h2 style="font-size: 1.4rem; margin-bottom: 0.35rem;">Choose your new password</h2>
+            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1.25rem;">
+                You are logging in with a temporary password. For security, please choose a private, permanent password to continue.
+            </p>
+
+            <form id="setup-password-form">
+                <div class="form-group">
+                    <label class="form-label required" for="new-password">New Password</label>
+                    <div class="pw-wrapper">
+                        <input type="password" id="new-password" class="form-control" placeholder="Choose a strong password" required autocomplete="new-password">
+                        <button type="button" class="pw-toggle-btn" id="toggle-new-pwd" title="Toggle password visibility">👁️</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required" for="confirm-password">Confirm New Password</label>
+                    <div class="pw-wrapper">
+                        <input type="password" id="confirm-password" class="form-control" placeholder="Re-type new password" required autocomplete="new-password">
+                        <button type="button" class="pw-toggle-btn" id="toggle-confirm-pwd" title="Toggle password visibility">👁️</button>
+                    </div>
+                </div>
+
+                <!-- Live Rule Checklist -->
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0.875rem; margin-bottom: 1.25rem;">
+                    <div style="font-size: 0.75rem; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 0.5rem;">
+                        Password Requirements
+                    </div>
+                    <div class="checklist-item" id="rule-len"><span class="icon">○</span> Minimum 10 characters</div>
+                    <div class="checklist-item" id="rule-upper"><span class="icon">○</span> At least one uppercase letter (A-Z)</div>
+                    <div class="checklist-item" id="rule-lower"><span class="icon">○</span> At least one lowercase letter (a-z)</div>
+                    <div class="checklist-item" id="rule-digit"><span class="icon">○</span> At least one number (0-9)</div>
+                    <div class="checklist-item" id="rule-match"><span class="icon">○</span> Passwords match</div>
+                </div>
+
+                <button type="submit" id="btn-save-password" class="btn btn-primary" style="width: 100%; height: 44px;">
+                    Save Password & Return to Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { API, Auth } from "/js/api.js";
+        import { UI } from "/js/ui.js";
+        import { HOME } from "/js/routes.js";
+        import { STRICT_BACK_LOGOUT } from "/js/config.js";
+
+        const panelLogin = document.getElementById("panel-login");
+        const panelSetup = document.getElementById("panel-setup-password");
+        const loginForm = document.getElementById("login-form");
+        const setupForm = document.getElementById("setup-password-form");
+
+        const noticeBox = document.getElementById("login-notice");
+        const alertBox = document.getElementById("login-alert");
+        const successBox = document.getElementById("login-success");
+        const submitBtn = document.getElementById("btn-submit");
+        const savePwdBtn = document.getElementById("btn-save-password");
+
+        // Keep setup token in JS memory ONLY (never in localStorage or sessionStorage)
+        let inMemorySetupToken = null;
+        let setupUserEmail = "";
+
+        function showNotice(msg) {
+            noticeBox.textContent = msg;
+            noticeBox.style.display = "block";
+            alertBox.style.display = "none";
+            successBox.style.display = "none";
+        }
+
+        function showAlert(msg) {
+            alertBox.textContent = msg;
+            alertBox.style.display = "block";
+            noticeBox.style.display = "none";
+            successBox.style.display = "none";
+        }
+
+        function showSuccess(msg) {
+            successBox.textContent = msg;
+            successBox.style.display = "block";
+            alertBox.style.display = "none";
+            noticeBox.style.display = "none";
+        }
+
+        function clearAlerts() {
+            noticeBox.style.display = "none";
+            alertBox.style.display = "none";
+            successBox.style.display = "none";
+        }
+
+        // Check URL reasons
+        function checkUrlReasons() {
+            const params = new URLSearchParams(window.location.search);
+            const reason = params.get("reason");
+            if (reason === "login") {
+                showNotice("Please sign in to access your dashboard.");
+            } else if (reason === "loggedout") {
+                showNotice("You were signed out. Please log in.");
+            } else if (reason === "expired") {
+                showNotice("Your session expired. Please log in.");
+            } else if (reason === "idle") {
+                showNotice("Signed out due to 15 minutes of inactivity. Please log in.");
+            } else if (reason === "password_change_required") {
+                showNotice("Please log in with your temporary password to choose a permanent password.");
+            }
+        }
+
+        // Section B.3: Back / Forward & BFcache guard for login page
+        // If a logged-in user arrives here (e.g. via Back button), redirect to their dashboard
+        // instead of destroying the session. This prevents confusing "session expired" messages.
+        window.addEventListener("pageshow", async (event) => {
+            // Only check URL reasons if there's no active session (user was redirected here)
+            const params = new URLSearchParams(window.location.search);
+            const reason = params.get("reason");
+
+            if (STRICT_BACK_LOGOUT) {
+                try {
+                    const hasActiveSession = await Auth.hasSession();
+                    if (hasActiveSession && !reason) {
+                        // User navigated Back while still logged in — redirect to their dashboard
+                        const user = Auth.getUser();
+                        if (user && user.role) {
+                            const targetHome = HOME[user.role] || "/index.html";
+                            window.location.replace(targetHome);
+                            return;
+                        }
+                        // If no cached user info, try restoring session to get role
+                        const me = await Auth.restoreSession();
+                        if (me && me.role) {
+                            const targetHome = HOME[me.role] || "/index.html";
+                            window.location.replace(targetHome);
+                            return;
+                        }
+                    }
+                } catch (_) {}
+            }
+
+            checkUrlReasons();
+        });
+
+        // Demo fill buttons
+        document.querySelectorAll(".demo-fill-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.getElementById("email").value = btn.dataset.email;
+                document.getElementById("password").value = btn.dataset.pwd;
+            });
+        });
+
+        // Password visibility toggles
+        function setupToggle(btnId, inputId) {
+            const btn = document.getElementById(btnId);
+            const inp = document.getElementById(inputId);
+            if (btn && inp) {
+                btn.addEventListener("click", () => {
+                    inp.type = inp.type === "password" ? "text" : "password";
+                });
+            }
+        }
+        setupToggle("toggle-login-pwd", "password");
+        setupToggle("toggle-new-pwd", "new-password");
+        setupToggle("toggle-confirm-pwd", "confirm-password");
+
+        // Live rule checklist for new password
+        const newPwdInput = document.getElementById("new-password");
+        const confirmPwdInput = document.getElementById("confirm-password");
+
+        function updateChecklist() {
+            const val = newPwdInput.value || "";
+            const confirmVal = confirmPwdInput.value || "";
+
+            const hasLen = val.length >= 10;
+            const hasUpper = /[A-Z]/.test(val);
+            const hasLower = /[a-z]/.test(val);
+            const hasDigit = /[0-9]/.test(val);
+            const isMatch = val.length > 0 && val === confirmVal;
+
+            function setItem(id, valid) {
+                const el = document.getElementById(id);
+                if (valid) {
+                    el.classList.add("valid");
+                    el.querySelector(".icon").textContent = "✓";
+                } else {
+                    el.classList.remove("valid");
+                    el.querySelector(".icon").textContent = "○";
+                }
+            }
+
+            setItem("rule-len", hasLen);
+            setItem("rule-upper", hasUpper);
+            setItem("rule-lower", hasLower);
+            setItem("rule-digit", hasDigit);
+            setItem("rule-match", isMatch);
+        }
+
+        newPwdInput?.addEventListener("input", updateChecklist);
+        confirmPwdInput?.addEventListener("input", updateChecklist);
+
+        // Handle Login Submission
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            clearAlerts();
+
+            const email = document.getElementById("email").value.trim().toLowerCase();
+            const password = document.getElementById("password").value;
+
+            if (!email || !password) {
+                showAlert("Please enter both email and password.");
+                return;
+            }
+
+            UI.setLoading(submitBtn, true);
+
+            try {
+                const res = await API.post("/auth/login", { email, password });
+
+                // Case 1: First login with temporary password -> switch to Panel 2 in-memory
+                if (res.status === "PASSWORD_CHANGE_REQUIRED" && res.setup_token) {
+                    inMemorySetupToken = res.setup_token;
+                    setupUserEmail = email;
+
+                    panelLogin.style.display = "none";
+                    panelSetup.style.display = "block";
+                    setupForm.reset();
+                    updateChecklist();
+                    return;
+                }
+
+                // Case 2: Normal login success
+                Auth.setToken(res.access_token);
+                Auth.setUser({
+                    id: res.user_id,
+                    full_name: res.full_name,
+                    role: res.role,
+                    provider_id: res.provider_id
+                });
+
+                // Open-redirect protection: validate ?next= against user's own role dashboard allowlist
+                const allowedHome = HOME[res.role.toLowerCase()] || "/index.html";
+                const nextParam = new URLSearchParams(window.location.search).get("next");
+                let targetUrl = allowedHome;
+                if (nextParam && nextParam === allowedHome) {
+                    targetUrl = allowedHome;
+                }
+
+                // Section B.2: location.assign keeps login page in history behind dashboard
+                window.location.assign(targetUrl);
+
+            } catch (err) {
+                showAlert(err.message || "Invalid email or password.");
+            } finally {
+                UI.setLoading(submitBtn, false);
+            }
+        });
+
+        // Handle Initial Password Save (Panel 2)
+        setupForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            clearAlerts();
+
+            const new_password = newPwdInput.value;
+            const confirm_password = confirmPwdInput.value;
+
+            if (new_password !== confirm_password) {
+                showAlert("Passwords do not match.");
+                return;
+            }
+
+            if (!inMemorySetupToken) {
+                showAlert("Setup session expired. Please sign in again.");
+                panelSetup.style.display = "none";
+                panelLogin.style.display = "block";
+                return;
+            }
+
+            UI.setLoading(savePwdBtn, true);
+
+            try {
+                await API.post("/auth/set-initial-password", {
+                    setup_token: inMemorySetupToken,
+                    new_password,
+                    confirm_password
+                });
+
+                // Success: clear token, clear forms, show login panel with success message
+                inMemorySetupToken = null;
+                setupForm.reset();
+                document.getElementById("password").value = "";
+
+                panelSetup.style.display = "none";
+                panelLogin.style.display = "block";
+                showSuccess("Password saved. Please log in with your new password.");
+
+            } catch (err) {
+                showAlert(err.message || "Failed to save password.");
+            } finally {
+                UI.setLoading(savePwdBtn, false);
+            }
+        });
+    </script>
+</body>
+</html>
