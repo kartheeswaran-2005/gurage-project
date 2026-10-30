@@ -1,0 +1,93 @@
+<USER_REQUEST>
+BikeCare: Fix 'Failed to load data' and Add Changes (Antigravity Prompt)
+Your screenshot shows the employee page 'Workshop Service Queue' with the message 'Failed to load data. Please retry.' and an empty table. That message is generic: the page caught an error and hid the real reason. The prompt below makes Antigravity find the real cause, fix it on every page, show clear messages, and prove the fix in a real browser.
+Before you paste: find the real error (1 minute)
+1. Open the page that shows the error and press F12, then click the Network tab.
+2. Press F5 to reload. Find the red line (usually a name starting with 'requests') and click it.
+3. Write down the Status number and the text under Response. Also copy any red text from the backend terminal.
+What the number usually means:
+• 401: the login was not restored on this page.
+• 403: the role is not allowed.
+• 404: the page is calling a wrong address.
+• 422: the page sent filter values the server does not accept.
+• 500: a server or database error, often a database change (migration) that was not applied.
+• 'failed' or 'CORS': the browser blocked the call, often because the page and the API use different host names (127.0.0.1 versus localhost).
+Put these details into the prompt where it says 'Error details'. The prompt still works if you leave them empty.
+PROMPT START
+You are a senior full-stack developer and QA automation engineer. Fix a bug and add the changes listed below in the existing BikeCare project in this workspace (FastAPI + SQLAlchemy + Alembic + Neon PostgreSQL backend, vanilla HTML/CSS/JavaScript frontend, pytest, Playwright). Do not change the technology stack. Do not weaken any security feature. Work on Windows with Python 3.10.
+The problem
+The employee page http://127.0.0.1:8000/employee/requests.html (title 'Workshop Service Queue', sidebar item 'Service Requests') shows the message 'Failed to load data. Please retry.' with an empty table and 'Showing 0 of 0'. The page is served from the same address as the API (127.0.0.1:8000). The same problem may exist on other pages (Dashboard, Mechanics, Invoices and Payments, and the pages of the mechanic, owner and customer roles).
+Error details (filled in by me, may be empty):
+• Status code in the browser Network tab: ______
+• Response text: ______
+• Backend terminal error: ______
+Working rules
+1. Do not guess. Reproduce the error first, find the root cause with evidence, then fix the cause. Do not fix it by hiding the error, returning an empty list, or turning off security.
+2. Write what you find in FIX_NOTES.md: the root cause, the evidence (status code, response, log line), and what you changed.
+3. Do not break existing features. Run the existing tests before and after.
+4. Prove the fix in a real browser. Do not say it works unless a test or a browser run showed it working.
+1. Reproduce and diagnose
+• Print (with the password hidden) which database the app is really using. Run alembic current and alembic upgrade head against that database and confirm every table and column the code uses exists.
+• Start the backend, log in as an employee in a real browser, open the Service Requests page, and capture the failing request: URL, status code, response body, and the backend log line with the same request id.
+• Check each likely cause below one by one and write the result in FIX_NOTES.md:
+    1. The access token is kept only in memory and is lost when the user moves to another page; the page calls the API before the session is restored (gives 401).
+    2. Host mismatch: the page is on 127.0.0.1 but the API address in JavaScript is localhost (or the reverse), so cookies and CORS fail. When the frontend is served by FastAPI, use a same-origin relative API path (/api/...) instead of a hard-coded host.
+    3. Cookie settings: Secure cookie on plain http, wrong Path, wrong SameSite, so the refresh cookie is not sent.
+    4. Status 422: empty filter values such as mechanic_id= or status= are sent, or page_size is above the allowed maximum. The frontend must omit empty parameters and the backend must treat empty strings as not set.
+    5. Status 403 or 404 from role or provider scope rules, for example an employee account with no provider_id.
+    6. Status 500: missing database column or table, an ORM or SQL error, a serialization error (Decimal, datetime, null relation such as no assigned mechanic yet), or a broken count query for pagination.
+    7. Response shape mismatch: the page expects {items, total, page, page_size} and certain field names, but the API returns something different.
+    8. Wrong path or trailing-slash redirect (307) that drops the Authorization header; router prefix mismatch.
+    9. Blocked by CORS, by the Content Security Policy (connect-src), by rate limiting (429 after many reloads), or by the login lockout.
+    10. The static file mount shadows API routes, or API routes are registered after a catch-all route.
+2. Fix the root cause everywhere
+• Create or repair one shared request helper in frontend/js/api.js that every page uses. It must: wait until the session is restored; attach the access token; on 401 do one silent refresh and retry once; parse JSON errors; and throw an error object with status, code and message. Remove duplicated fetch code from individual pages.
+• Every page must call the shared guard first and request data only after the guard passes.
+• Apply the fix to all pages of all four roles, not only the Service Requests page.
+3. Clear error and empty states
+Replace the generic message with messages based on the status, with a Retry button and no stack traces:
+• 401: 'Your session expired. Please log in again.' (then go to the login page)
+• 403: 'You do not have permission to view this.'
+• 404: 'This data could not be found.'
+• 422: 'Some filter values are not valid.'
+• 429: 'Too many requests. Please wait a minute and try again.'
+• 500 or network failure: 'Something went wrong on the server. Please try again.' plus the request id.
+Also show a loading state while data loads, and a separate friendly empty state ('No service requests found') when the request succeeds with zero rows. An empty list must never look like an error and an error must never look like an empty list. Log technical details with console.error and in the backend log with a request id.
+4. Backend checks for the employee requests list
+• The list endpoint must support q (job reference or registration number, with % and _ escaped), status, mechanic_id, date_from, date_to, page and page_size, return one consistent shape, and always filter by the employee's provider.
+• Add GET /api/health that checks the database connection and returns the current migration revision. Print the same information in the startup log.
+• Write pytest tests for the list endpoint: zero rows, many rows, each filter alone, all filters together, empty-string filters, wrong values (422 with a clear message), a different provider (no leakage), and an employee without a provider.
+5. Additional changes I want
+Implement each change below completely: backend, database migration if needed, every affected page, and tests. If a change is unclear, make a sensible choice and note it in FIX_NOTES.md.
+1. (write change 1 here)
+2. (write change 2 here)
+3. (write change 3 here)
+6. Tests in a real browser (Playwright for Python)
+Use a temporary test database with sample service requests and test-only ports. Never touch the real Neon database.
+1. Log in as an employee, open Service Requests: rows are visible, search and each filter work, pagination works.
+2. With no data: the empty state is shown, not an error.
+3. Make the API return 500 (test hook or mock): a friendly message and a working Retry button appear.
+4. Access token expired: the page recovers by itself. Refresh session revoked: the user goes to the login page with a message.
+5. Smoke test: log in as each role (customer, employee, mechanic, owner) and open every page from the sidebar. Assert that no page shows a failure message, that no network request returns 4xx or 5xx except the ones the test expects, and that there are no JavaScript console errors.
+6. Open the app once through http://127.0.0.1:8000 and once through http://localhost:8000 and confirm both work.
+Run pytest and the Playwright tests, fix every failure, and run them again until they pass.
+7. When you finish
+Tell me in simple words: what the root cause was, how you fixed it, which of my additional changes are done, and which tests passed and failed. Keep FIX_NOTES.md in the project.
+PROMPT END
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-22T12:20:04+05:30.
+
+The user's current state is as follows:
+Active Document: c:\Users\DELL\Desktop\gaurage project\BikeCare\SECURITY.md (LANGUAGE_MARKDOWN)
+Cursor is on line: 1
+Other open documents:
+- c:\Users\DELL\Desktop\gaurage project\BikeCare\backend\test_browser_login.py (LANGUAGE_PYTHON)
+- c:\Users\DELL\Desktop\gaurage project\BikeCare\SECURITY.md (LANGUAGE_MARKDOWN)
+- c:\Users\DELL\Desktop\gaurage project\BikeCare\frontend\serve.py (LANGUAGE_PYTHON)
+- c:\Users\DELL\Desktop\gaurage project\BikeCare\frontend\js\auth-guard.js (LANGUAGE_JAVASCRIPT)
+- c:\Users\DELL\Desktop\gaurage project\BikeCare\frontend\login.html (LANGUAGE_HTML)
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from None to Claude Sonnet 4.6 (Thinking). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>

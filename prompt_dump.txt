@@ -1,0 +1,47 @@
+<USER_REQUEST>
+BikeCare: Fix 'Failed to load data' and Add Changes (Antigravity Prompt)
+Your screenshot shows the employee page 'Workshop Service Queue' with the message 'Failed to load data. Please retry.' and an empty table. That message is generic: the page caught an error and hid the real reason. The prompt below makes Antigravity find the real cause, fix it on every page, show clear messages, and prove the fix in a real browser.
+Before you paste: find the real error (1 minute)
+1. Open the page that shows the error and press F12, then click the Network tab.
+2. Press F5 to reload. Find the red line (usually a name starting with 'requests') and click it.
+3. Write down the Status number and the text under Response. Also copy any red text from the backend terminal.
+What the number usually means:
+• 401: the login was not restored on this page.
+• 403: the role is not allowed.
+• 404: the page is calling a wrong address.
+• 422: the page sent filter values the server does not accept.
+• 500: a server or database error, often a database change (migration) that was not applied.
+• 'failed' or 'CORS': the browser blocked the call, often because the page and the API use different host names (127.0.0.1 versus localhost).
+Put these details into the prompt where it says 'Error details'. The prompt still works if you leave them empty.
+PROMPT START
+You are a senior full-stack developer and QA automation engineer. Fix a bug and add the changes listed below in the existing BikeCare project in this workspace (FastAPI + SQLAlchemy + Alembic + Neon PostgreSQL backend, vanilla HTML/CSS/JavaScript frontend, pytest, Playwright). Do not change the technology stack. Do not weaken any security feature. Work on Windows with Python 3.10.
+The problem
+The employee page http://127.0.0.1:8000/employee/requests.html (title 'Workshop Service Queue', sidebar item 'Service Requests') shows the message 'Failed to load data. Please retry.' with an empty table and 'Showing 0 of 0'. The page is served from the same address as the API (127.0.
+<truncated 5535 bytes>
+ filter work, pagination works.
+2. With no data: the empty state is shown, not an error.
+3. Make the API return 500 (test hook or mock): a friendly message and a working Retry button appear.
+4. Access token expired: the page recovers by itself. Refresh session revoked: the user goes to the login page with a message.
+5. Smoke test: log in as each role (customer, employee, mechanic, owner) and open every page from the sidebar. Assert that no page shows a failure message, that no network request returns 4xx or 5xx except the ones the test expects, and that there are no JavaScript console errors.
+6. Open the app once through http://127.0.0.1:8000 and once through http://localhost:8000 and confirm both work.
+Run pytest and the Playwright tests, fix every failure, and run them again until they pass.
+7. When you finish
+Tell me in simple words: what the root cause was, how you fixed it, which of my additional changes are done, and which tests passed and failed. Keep FIX_NOTES.md in the project.
+PROMPT END
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-22T12:20:04+05:30.
+
+The user's current state is as follows:
+Active Document: c:\Users\DELL\Desktop\gaurage project\BikeCare\SECURITY.md (LANGUAGE_MARKDOWN)
+Cursor is on line: 1
+Other open documents:
+- c:\Users\DELL\Desktop\gaurage project\BikeCare\backend\test_browser_login.py (LANGUAGE_PYTHON)
+- c:\Users\DELL\Desktop\gaurage project\BikeCare\SECURITY.md (LANGUAGE_MARKDOWN)
+- c:\Users\DELL\Desktop\gaurage project\BikeCare\frontend\serve.py (LANGUAGE_PYTHON)
+- c:\Users\DELL\Desktop\gaurage project\BikeCare\frontend\js\auth-guard.js (LANGUAGE_JAVASCRIPT)
+- c:\Users\DELL\Desktop\gaurage project\BikeCare\frontend\login.html (LANGUAGE_HTML)
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from None to Claude Sonnet 4.6 (Thinking). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>

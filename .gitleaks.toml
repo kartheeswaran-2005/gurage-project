@@ -1,0 +1,18 @@
+# BikeCare Gitleaks / Secret Scanner Configuration
+title = "BikeCare Secret Scanner Config"
+
+[detect-secrets]
+exclude_files = '''(?x)
+    (
+        \.git/.*
+        | backend/venv/.*
+        | \.pytest_cache/.*
+        | __pycache__/.*
+        | \.env\.example
+        | tests/.*
+    )
+'''
+
+[rules]
+description = "High entropy strings & credentials"
+regex = '''(?i)(api_key|secret_key|private_key|token_hash|password|auth_token)\s*[:=]\s*['"][a-zA-Z0-9_\-]{16,}['"]'''
